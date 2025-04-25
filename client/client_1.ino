@@ -9,7 +9,7 @@ const char* server_ip = "192.168.4.1";
 const uint16_t server_port = 80;
 
 int x;
-int sid = 0;
+int sid;
 WiFiClient client;
 
 void setup() {
@@ -26,29 +26,32 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("\nConected");
-
+  EEPROM.get(0,sid);
 
 }
 
 void loop() {
 
-
+  Serial.print("SID ANTES: ");
+  Serial.println(sid);
   while(!client.connect(server_ip, server_port)){
-    Serial.println(".");
+    Serial.print(".");
   }
   Serial.println("Conected to ESP32 Server");
   
   x = analogRead(sensor);
 
-  int tmp; 
-  EEPROM.get(0, tmp);
-  Serial.print("TMP: ");
-  Serial.println(tmp);
+    /*int tmp; 
+    EEPROM.get(0, tmp);
+    Serial.print("TMP: ");
+    Serial.println(tmp);*/
 
-  if(tmp == 0){
+  if(sid == -1){
     client.println(String(0) + " " + String(x));
     delay(1000);
     String string_id = client.readStringUntil('\n');
+    Serial.print("SID RECEBIDO: ");
+    Serial.println(string_id);
     sid = string_id.toInt();
     EEPROM.put(0, sid);
     EEPROM.commit();
@@ -59,8 +62,8 @@ void loop() {
     Serial.println(msg);
   }
   else{
-    sid = tmp;
-    client.println(sid + " " + x);
+    //sid = tmp;
+    client.println(String(sid) + " " + String(x));
     String msg = client.readStringUntil('\n');
     Serial.println(msg);
   }

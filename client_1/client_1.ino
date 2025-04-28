@@ -34,37 +34,38 @@ void loop() {
   EEPROM.get(0,sid);
   Serial.print("SID ANTES: ");
   Serial.println(sid);
-  while(!client.connect(server_ip, server_port)){
-    Serial.print(".");
-  }
-  Serial.println("Conected to ESP32 Server");
-  
-  x = analogRead(sensor);
+  if(client.connect(server_ip, server_port)){
+    
+    Serial.println("Conected to ESP32 Server");
+    
+    x = analogRead(sensor);
 
-    /*int tmp; 
-    EEPROM.get(0, tmp);
-    Serial.print("TMP: ");
-    Serial.println(tmp);*/
+      /*int tmp; 
+      EEPROM.get(0, tmp);
+      Serial.print("TMP: ");
+      Serial.println(tmp);*/
 
-  if(sid == -1){
-    client.println(String(0) + " " + String(x));
-    delay(1000);
-    String string_id = client.readStringUntil('\n');
-    Serial.print("SID RECEBIDO: ");
-    Serial.println(string_id);
-    sid = string_id.toInt();
-    EEPROM.put(0, sid);
-    EEPROM.commit();
-    Serial.print("SID: ");
-    Serial.println(sid);
-    delay(500);
-    String msg = client.readStringUntil('\n');
-    Serial.println(msg);
-  }
-  else{
-    //sid = tmp;
-    client.println(String(sid) + " " + String(x));
-    String msg = client.readStringUntil('\n');
-    Serial.println(msg);
+    if(sid == -1){
+      client.println(String(0) + " " + String(x));
+      delay(1000);
+      String string_id = client.readStringUntil('\n');
+      Serial.print("SID RECEBIDO: ");
+      Serial.println(string_id);
+      sid = string_id.toInt();
+      EEPROM.put(0, sid);
+      EEPROM.commit();
+      Serial.print("SID: ");
+      Serial.println(sid);
+      delay(500);
+      String msg = client.readStringUntil('\n');
+      Serial.println(msg);
+    }
+    else{
+      //sid = tmp;
+      client.println(String(sid) + " " + String(x));
+      String msg = client.readStringUntil('\n');
+      Serial.println(msg);
+    }
+    client.stop();
   }
 }

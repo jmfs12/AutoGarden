@@ -51,6 +51,7 @@ String sendInfo(){
       //sid = tmp;
       client.println(String(sid) + " " + String(x));
       String msg = client.readStringUntil('\n');
+      Serial.println(msg);
       client.stop();
       Serial.println("Disconnected");
       return msg;
@@ -77,9 +78,11 @@ void setup() {
   Serial.println("\nConected");
 
   String f = "";
-  while(f != "T"){
+  while(f.charAt(0) != 'T'){
     f = sendInfo();
+    Serial.println("FLAG = " + f);
   }
+  Serial.println("dps do loop");
   digitalWrite(flag, HIGH);
   
 }

@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
 #define sensor A0
+#define flag 12
 
 const char* ssid = "ESP32-AP";
 const char* password = "12345678";
@@ -10,22 +11,10 @@ const uint16_t server_port = 80;
 
 int x;
 int sid;
+long timer;
 WiFiClient client;
 
-void setup() {
-  Serial.begin(115200);
-  delay(1000);
-
-  EEPROM.begin(1024);
-
-  pinMode(sensor, INPUT);
-  WiFi.begin(ssid, password);
-  Serial.println("Conecting ao ESP32-AP");
-  while(WiFi.status() != WL_CONNECTED){
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nConected");
+String sendInfo(){
 
   EEPROM.get(0,sid);
   Serial.print("SID ANTES: ");
@@ -54,19 +43,47 @@ void setup() {
       Serial.println(sid);
       delay(500);
       String msg = client.readStringUntil('\n');
-      Serial.println(msg);
+      client.stop();
+      Serial.println("Disconnected");
+      return msg;
     }
     else{
       //sid = tmp;
       client.println(String(sid) + " " + String(x));
       String msg = client.readStringUntil('\n');
-      Serial.println(msg);
+      client.stop();
+      Serial.println("Disconnected");
+      return msg;
     }
-    client.stop();
-    Serial.println("Disconnected");
   }
+  else return "F";
 
 }
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  EEPROM.begin(1024);
+
+  pinMode(sensor, INPUT);
+  pinMode(flag, OUTPUT);
+  WiFi.begin(ssid, password);
+  Serial.println("Conecting ao ESP32-AP");
+  while(WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConected");
+
+  String f = "";
+  while(f != "T"){
+    f = sendInfo();
+  }
+  digitalWrite(flag, HIGH);
+  
+}
+
 
 void loop() {
 

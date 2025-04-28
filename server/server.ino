@@ -83,12 +83,12 @@ void loop() {
             else{
               Serial.print("Value: ");
               Serial.println(val);
-              client.println("Value received succesfully");
+              client.println("T");
               dict[sid] = val;
             }
           }
           else{
-            Serial.println("Empty value");
+            client.println("F");
           }
         }
         else{
@@ -103,12 +103,12 @@ void loop() {
               else{
                 Serial.print("Value: ");
                 Serial.println(val);
-                client.println("Value received succesfully");
+                client.println("T");
                 dict[sid] = val;
               }
             }
             else{
-              Serial.println("Empty value");
+              client.println("F");
             }
           }
         }

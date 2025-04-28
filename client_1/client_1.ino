@@ -19,17 +19,13 @@ void setup() {
   EEPROM.begin(1024);
 
   pinMode(sensor, INPUT);
-   WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password);
   Serial.println("Conecting ao ESP32-AP");
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
     Serial.print(".");
   }
   Serial.println("\nConected");
-
-}
-
-void loop() {
 
   EEPROM.get(0,sid);
   Serial.print("SID ANTES: ");
@@ -67,5 +63,11 @@ void loop() {
       Serial.println(msg);
     }
     client.stop();
+    Serial.println("Disconnected");
   }
+
+}
+
+void loop() {
+
 }

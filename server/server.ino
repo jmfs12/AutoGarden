@@ -11,6 +11,7 @@ const char* password_ap = "12345678";
 std::map<int,int> dict;
 
 WiFiServer server(80);
+unsigned long start;
 
 void setup() {
 
@@ -19,13 +20,16 @@ void setup() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid_sta, password_sta);
 
+  start = millis();
   while(WiFi.status() != WL_CONNECTED){
-    delay(500);
+    
+    while(millis() - start < 500){}
+
   }
 
   bool ap = WiFi.softAP(ssid_ap,password_ap);
   
-  delay(1000);
+  while(millis() - start < 1000){}
 
   server.begin();
 

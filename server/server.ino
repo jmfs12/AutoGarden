@@ -57,8 +57,8 @@ void loop() {
         String value = client.readStringUntil('\n');
         value.trim();
 
+        Serial.println("sid antes: " + id);
         int sid = id.toInt();
-        Serial.println(sid);
         int val = value.toInt();
 
         if(sid == 0){
@@ -72,7 +72,7 @@ void loop() {
           EEPROM.commit();
 
           sid = i;
-          Serial.print("ID: ");
+          Serial.print("sid depois: ");
           Serial.println(sid);
           client.println(sid);
 

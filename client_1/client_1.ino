@@ -26,12 +26,19 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("\nConected");
+<<<<<<< HEAD:client/client_1/client_1.ino
+=======
+  EEPROM.get(0,sid);
+>>>>>>> b69b30b199306bf60d0423914ce032f539f1324a:client/client_1.ino
 
 }
 
 void loop() {
 
+<<<<<<< HEAD:client/client_1/client_1.ino
   EEPROM.get(0,sid);
+=======
+>>>>>>> b69b30b199306bf60d0423914ce032f539f1324a:client/client_1.ino
   Serial.print("SID ANTES: ");
   Serial.println(sid);
   while(!client.connect(server_ip, server_port)){

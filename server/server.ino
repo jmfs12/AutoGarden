@@ -13,7 +13,7 @@ std::map<int,int> dict;
 WiFiServer server(80);
 
 void setup() {
-  delay(1000);
+
   EEPROM.begin(512);
 
   WiFi.mode(WIFI_AP_STA);
@@ -28,6 +28,7 @@ void setup() {
   delay(1000);
 
   server.begin();
+
 }
 
 void loop() {
@@ -65,8 +66,6 @@ void loop() {
 
           if(value.length()>0 && val == 0 && value != "0"){
 
-            Serial.print("Value: ");
-            Serial.println(val);
             client.println("T");
             dict[sid] = val;
           
@@ -85,8 +84,6 @@ void loop() {
 
             if(value.length()>0 && val == 0 && value != "0"){
 
-              Serial.print("Value: ");
-              Serial.println(val);
               client.println("T");
               dict[sid] = val;
 

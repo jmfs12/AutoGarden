@@ -70,10 +70,15 @@ void resetId(){
   EEPROM.get(0, sid);
 
   if(client.connect(server_ip, server_port)){
+    Serial.println("Conectado");
     client.println(String(sid) + "R");
 
     EEPROM.put(0, -1);
     EEPROM.commit();
+
+    int tmp;
+    EEPROM.get(0, tmp);
+    Serial.println(tmp);
 
     client.stop();
   }
@@ -116,7 +121,6 @@ void setup() {
 void loop() {
 
   int bt = digitalRead(button);
-  Serial.println(bt);
 
   if (bt == LOW && !waiting) {
     waiting = true;
@@ -133,6 +137,7 @@ void loop() {
 
     if (ledActivated && millis() - ledOnTime >= 2000) {
       digitalWrite(led, LOW);
+      Serial.println("Resetando");
       resetId();
       waiting = false;
     }

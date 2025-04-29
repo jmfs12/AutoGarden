@@ -44,53 +44,34 @@ void loop() {
     while(client.connected()){
 
       if(client.available()){
-
         String id = client.readStringUntil(' ');
-        String value = client.readStringUntil('\n');
-        value.trim();
+        String cmd = client.readStringUntil('\n');
+        if(cmd.charAt(0) != 'R'){
+          cmd.trim();
+          int sid = id.toInt();
+          int val = cmd.toInt();
 
-        int sid = id.toInt();
-        int val = value.toInt();
+          if(sid == 0){
 
-        if(sid == 0){
+            int i = 300;
+            int tmp;
 
-          int i = 300;
-          int tmp;
+            do{
+              EEPROM.get(i, tmp);
+              i++;
+            }while(tmp != -1 && i < 512);
 
-          do{
-            EEPROM.get(i, tmp);
-            i++;
-          }while(tmp != -1 && i < 512);
+            EEPROM.put(i, i);
+            EEPROM.commit();
 
-          EEPROM.put(i, i);
-          EEPROM.commit();
+            sid = i;
+            client.println(sid);
 
-          sid = i;
-          client.println(sid);
-
-          if(value.length()>0 && val == 0 && value != "0"){
-
-            client.println("T");
-            dict[sid] = val;
-          
-          } else{
-
-            client.println("F");
-          }
-
-        }
-
-        else{
-
-          int s; EEPROM.get(sid, s);
-
-          if(s == sid){
-
-            if(value.length()>0 && val == 0 && value != "0"){
+            if(cmd.length()>0 && val == 0 && cmd != "0"){
 
               client.println("T");
               dict[sid] = val;
-
+            
             } else{
 
               client.println("F");
@@ -98,6 +79,30 @@ void loop() {
 
           }
 
+          else{
+
+            int s; EEPROM.get(sid, s);
+
+            if(s == sid){
+
+              if(cmd.length()>0 && val == 0 && cmd != "0"){
+
+                client.println("T");
+                dict[sid] = val;
+
+              } else{
+
+                client.println("F");
+              }
+
+            }
+
+          }
+        }
+        else {
+          int sid = id.toInt();
+          EEPROM.put(sid, -1);
+          EEPROM.commit();
         }
 
       }

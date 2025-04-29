@@ -16,6 +16,7 @@ unsigned long start;
 unsigned long now;
 int x;
 int sid;
+bool waiting = false;
 WiFiClient client;
 
 String sendInfo(){
@@ -60,13 +61,12 @@ void resetId(){
 
   if(client.connect(server_ip, server_port)){
 
-    client.println(sid + "R");
+    client.println(String(sid) + " R");
 
     EEPROM.put(0, -1);
     EEPROM.commit();
 
-
-
+    client.stop();
   }
 }
 
@@ -105,21 +105,20 @@ void setup() {
 void loop() {
   int bt = digitalRead(button);
 
-  if (bt == LOW && !waiting) { // Detectou botão pressionado
+  if (bt == LOW && !waiting) { 
     waiting = true;
     now = millis();
   }
 
   if (waiting) {
-    // Se passaram 2 segundos e botão ainda pressionado
     if ((millis() - now >= 2000) && (digitalRead(button) == LOW)) {
       digitalWrite(led, HIGH);
       resetId();
-      waiting = false; // Reset
+      waiting = false; 
     }
-    // Se botão soltar antes dos 2 segundos
+
     else if (digitalRead(button) == HIGH) {
-      waiting = false; // Cancela
+      waiting = false; 
     }
   }
 }

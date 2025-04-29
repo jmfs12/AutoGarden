@@ -16,10 +16,12 @@ int x;
 int sid;
 
 WiFiClient client;
-unsigned long now;
-unsigned long outled;
-
 bool waiting = false;
+bool ledActivated = false;
+unsigned long now = 0;
+unsigned long ledOnTime = 0;
+
+
 
 String sendInfo(){
 
@@ -116,23 +118,28 @@ void loop() {
   int bt = digitalRead(button);
   Serial.println(bt);
 
-  if(bt == LOW && !waiting){
+  if (bt == LOW && !waiting) {
     waiting = true;
     now = millis();
+    ledActivated = false;  // nova flag
   }
 
-  if(waiting){
-    if(digitalRead(button) == LOW && millis()-now >= 2000){
-
+  if (waiting) {
+    if (digitalRead(button) == LOW && millis() - now >= 2000 && !ledActivated) {
       digitalWrite(led, HIGH);
-      delay(2000);
+      ledOnTime = millis();   // marca quando o LED foi ligado
+      ledActivated = true;
+    }
+
+    if (ledActivated && millis() - ledOnTime >= 2000) {
       digitalWrite(led, LOW);
       resetId();
       waiting = false;
-
     }
-    else if(digitalRead(button) == HIGH){
+
+    if (digitalRead(button) == HIGH && !ledActivated) {
       waiting = false;
     }
   }
+
 }

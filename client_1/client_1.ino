@@ -4,7 +4,7 @@
 #define sensor A0
 #define flag 12
 #define button 15
-#define led 18
+#define led 14
 
 const char* ssid = "ESP32-AP";
 const char* password = "12345678";
@@ -71,6 +71,8 @@ void resetId(){
 }
 
 void setup() {
+  Serial.begin(115200);
+  delay(1000);
 
   EEPROM.begin(1024);
 
@@ -112,10 +114,12 @@ void loop() {
 
   if (waiting) {
     if ((millis() - now >= 2000) && (digitalRead(button) == LOW)) {
+      Serial.println("Resetando");
       digitalWrite(led, HIGH);
       resetId();
       waiting = false; 
     }
+    else { Serial.println("Aguardando");}
 
     else if (digitalRead(button) == HIGH) {
       waiting = false; 

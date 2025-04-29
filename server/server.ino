@@ -11,32 +11,30 @@ const char* password_ap = "12345678";
 std::map<int,int> dict;
 
 WiFiServer server(80);
-unsigned long start;
 
 void setup() {
-
+  Serial.begin(115200);
+  delay(1000);
   EEPROM.begin(512);
 
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid_sta, password_sta);
 
-  start = millis();
   while(WiFi.status() != WL_CONNECTED){
-    
-    while(millis() - start < 500){}
-
+    delay(500);
   }
 
   bool ap = WiFi.softAP(ssid_ap,password_ap);
-  
-  while(millis() - start < 1000){}
+
+  delay(1000);
 
   server.begin();
+  Serial.println("Server criado");
 
 }
 
 void loop() {
-  
+
   WiFiClient client = server.available();
 
   if(client){
@@ -44,34 +42,56 @@ void loop() {
     while(client.connected()){
 
       if(client.available()){
+        Serial.println("Client conectado");
+
         String id = client.readStringUntil(' ');
-        String cmd = client.readStringUntil('\n');
-        if(cmd.charAt(0) != 'R'){
-          cmd.trim();
-          int sid = id.toInt();
-          int val = cmd.toInt();
+        String value = client.readStringUntil('\n');
+        value.trim();
 
-          if(sid == 0){
+        int sid = id.toInt();
+        int val = value.toInt();
 
-            int i = 300;
-            int tmp;
+        if(sid == 0){
 
-            do{
-              EEPROM.get(i, tmp);
-              i++;
-            }while(tmp != -1 && i < 512);
+          int i = 300;
+          int tmp;
 
-            EEPROM.put(i, i);
-            EEPROM.commit();
+          do{
+            EEPROM.get(i, tmp);
+            i++;
+          }while(tmp != -1 && i < 512);
 
-            sid = i;
-            client.println(sid);
+          EEPROM.put(i, i);
+          EEPROM.commit();
 
-            if(cmd.length()>0 && val == 0 && cmd != "0"){
+          sid = i;
+          client.println(sid);
 
+          if(value.length()>0 && val == 0 && value != "0"){
+
+            Serial.println("enviando resposta");
+            client.println("T");
+            dict[sid] = val;
+
+          } else{
+
+            client.println("F");
+          }
+
+        }
+
+        else{
+
+          int s; EEPROM.get(sid, s);
+
+          if(s == sid){
+
+            if(value.length()>0 && val == 0 && value != "0"){
+
+              Serial.println("enviando resposta");
               client.println("T");
               dict[sid] = val;
-            
+
             } else{
 
               client.println("F");
@@ -79,30 +99,6 @@ void loop() {
 
           }
 
-          else{
-
-            int s; EEPROM.get(sid, s);
-
-            if(s == sid){
-
-              if(cmd.length()>0 && val == 0 && cmd != "0"){
-
-                client.println("T");
-                dict[sid] = val;
-
-              } else{
-
-                client.println("F");
-              }
-
-            }
-
-          }
-        }
-        else {
-          int sid = id.toInt();
-          EEPROM.put(sid, -1);
-          EEPROM.commit();
         }
 
       }
@@ -110,5 +106,5 @@ void loop() {
     }
     client.stop();
   }
-  
+
 }
